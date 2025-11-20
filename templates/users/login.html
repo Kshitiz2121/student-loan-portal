@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Student Loan Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header text-center" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                    <h4 class="mb-0 text-dark">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Student Login
+                    </h4>
+                    <p class="mb-0 text-dark">Access your student loan portal account</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Email Field -->
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label text-white">
+                                <i class="bi bi-envelope me-1"></i>Email Address
+                            </label>
+                            <input type="email" name="username" class="form-control" id="id_username" 
+                                   placeholder="Enter your email address" required>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label text-white">
+                                <i class="bi bi-lock me-1"></i>Password
+                            </label>
+                            <input type="password" name="password" class="form-control" id="id_password" 
+                                   placeholder="Enter your password" required>
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label text-white" for="rememberMe">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            </button>
+                        </div>
+
+                        <!-- Forgot Password Link -->
+                        <div class="text-center mb-3">
+                            <a href="#" class="text-decoration-none text-primary">
+                                <i class="bi bi-question-circle me-1"></i>Forgot your password?
+                            </a>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="text-center mb-3">
+                            <span class="text-muted">or</span>
+                        </div>
+
+                        <!-- Register Link -->
+                        <div class="text-center">
+                            <p class="mb-0 text-white">
+                                Don't have an account? 
+                                <a href="{% url 'users:register' %}" class="text-decoration-none fw-bold text-primary">
+                                    <i class="bi bi-person-plus me-1"></i>Register here
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Information Card -->
+            <div class="card mt-4 border-primary">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                    <h6 class="mb-0 text-dark">
+                        <i class="bi bi-info-circle me-2"></i>Need Help?
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2 text-white">
+                        <i class="bi bi-question-circle me-2 text-primary"></i>
+                        <strong>Forgot your password?</strong> Contact our support team.
+                    </p>
+                    <p class="mb-2 text-white">
+                        <i class="bi bi-envelope me-2 text-primary"></i>
+                        <strong>Email:</strong> support@studentloanportal.com
+                    </p>
+                    <p class="mb-0 text-white">
+                        <i class="bi bi-telephone me-2 text-primary"></i>
+                        <strong>Phone:</strong> +91-1800-123-4567
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border: none;
+        color: var(--dark-bg);
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    }
+    
+    .card {
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 32px var(--shadow-color);
+    }
+</style>
+{% endblock %}

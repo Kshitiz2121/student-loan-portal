@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .payment-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✅ Payment Confirmed</h1>
+        <h2>Your payment has been successfully processed</h2>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ student.get_full_name }},</p>
+        
+        <p>We have successfully received and processed your payment!</p>
+        
+        <div class="payment-details">
+            <h3>Payment Details</h3>
+            <p><strong>Payment Amount:</strong> <span class="amount">₹{{ repayment.amount_paid }}</span></p>
+            <p><strong>Payment Date:</strong> {{ payment_date|date:"F d, Y" }} at {{ payment_date|time:"H:i" }}</p>
+            <p><strong>Payment Method:</strong> {{ repayment.payment_method }}</p>
+            {% if repayment.transaction_id %}
+                <p><strong>Transaction ID:</strong> {{ repayment.transaction_id }}</p>
+            {% endif %}
+            <p><strong>Loan ID:</strong> #{{ loan.id }}</p>
+        </div>
+        
+        <div class="payment-details">
+            <h3>Loan Status</h3>
+            <p><strong>Remaining Amount:</strong> ₹{{ remaining_amount|floatformat:2 }}</p>
+            {% if remaining_amount > 0 %}
+                <p>Continue making payments to complete your loan repayment.</p>
+            {% else %}
+                <p><strong>🎉 Congratulations! Your loan has been fully paid!</strong></p>
+            {% endif %}
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{{ BASE_URL }}/repayments/list/" class="button">View Payment History</a>
+        </div>
+        
+        <p><strong>What's Next?</strong></p>
+        <ul>
+            <li>Keep this email as proof of payment</li>
+            <li>Continue making regular payments if balance remains</li>
+            <li>Contact us if you have any questions</li>
+        </ul>
+        
+        <p>Thank you for your timely payment!</p>
+        
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>Student Loan Portal | support@studentloanportal.com</p>
+        </div>
+    </div>
+</body>
+</html>

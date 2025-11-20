@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}Withdrawal History - Student Loan Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold text-white">
+                    <i class="bi bi-cash-stack me-2 text-success"></i>Withdrawal History
+                </h2>
+                <p class="lead text-muted">
+                    Track all your withdrawal requests and their status.
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a href="{% url 'repayments:withdrawal_create' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-2"></i>Request New Withdrawal
+                    </a>
+                </div>
+                <div>
+                    {% if user.is_staff %}
+                        <a href="{% url 'repayments:admin_withdrawal_management' %}" class="btn btn-primary">
+                            <i class="bi bi-gear me-2"></i>Admin Management
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Withdrawals Table -->
+            <div class="card shadow">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                    <h5 class="mb-0 text-dark">
+                        <i class="bi bi-list-ul me-2"></i>Withdrawal Requests
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if withdrawals %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Withdrawal ID</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        <th>Requested Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for withdrawal in withdrawals %}
+                                        <tr>
+                                            <td>
+                                                <strong>#{{ withdrawal.id }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-success">₹{{ withdrawal.amount|floatformat:2 }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ withdrawal.withdrawal_method }}</span>
+                                            </td>
+                                            <td>
+                                                {% if withdrawal.status == 'Pending' %}
+                                                    <span class="badge bg-warning">{{ withdrawal.status }}</span>
+                                                {% elif withdrawal.status == 'Processing' %}
+                                                    <span class="badge bg-primary">{{ withdrawal.status }}</span>
+                                                {% elif withdrawal.status == 'Completed' %}
+                                                    <span class="badge bg-success">{{ withdrawal.status }}</span>
+                                                {% elif withdrawal.status == 'Failed' %}
+                                                    <span class="badge bg-danger">{{ withdrawal.status }}</span>
+                                                {% elif withdrawal.status == 'Cancelled' %}
+                                                    <span class="badge bg-secondary">{{ withdrawal.status }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ withdrawal.created_at|date:"M d, Y" }}
+                                                <br>
+                                                <small class="text-muted">{{ withdrawal.created_at|time:"H:i" }}</small>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'repayments:withdrawal_detail' withdrawal.pk %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye me-1"></i>View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if page_obj.has_other_pages %}
+                            <div class="card-footer">
+                                <nav aria-label="Withdrawal pagination">
+                                    <ul class="pagination justify-content-center mb-0">
+                                        {% if page_obj.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                            </li>
+                                        {% endif %}
+                                        
+                                        {% for num in page_obj.paginator.page_range %}
+                                            {% if page_obj.number == num %}
+                                                <li class="page-item active">
+                                                    <span class="page-link">{{ num }}</span>
+                                                </li>
+                                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if page_obj.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-cash-stack display-1 text-muted"></i>
+                            <h4 class="text-muted mt-3">No Withdrawals Found</h4>
+                            <p class="text-muted">You haven't made any withdrawal requests yet.</p>
+                            <a href="{% url 'repayments:withdrawal_create' %}" class="btn btn-success">
+                                <i class="bi bi-plus-circle me-2"></i>Request Your First Withdrawal
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            {% if withdrawals %}
+                <div class="row mt-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-primary">Total Requests</h5>
+                                <h3 class="text-primary">{{ withdrawals|length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-warning">Pending</h5>
+                                <h3 class="text-warning">
+                                    {% for withdrawal in withdrawals %}
+                                        {% if withdrawal.status == 'Pending' %}{{ forloop.counter0|add:1 }}{% endif %}
+                                    {% endfor %}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-success">Completed</h5>
+                                <h3 class="text-success">
+                                    {% for withdrawal in withdrawals %}
+                                        {% if withdrawal.status == 'Completed' %}{{ forloop.counter0|add:1 }}{% endif %}
+                                    {% endfor %}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-info">Total Amount</h5>
+                                <h3 class="text-info">
+                                    ₹{% for withdrawal in withdrawals %}{{ withdrawal.amount|floatformat:2 }}{% if not forloop.last %}+{% endif %}{% endfor %}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add some interactive features
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover effects to table rows
+        const tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+            });
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+            });
+        });
+    });
+</script>
+{% endblock %}

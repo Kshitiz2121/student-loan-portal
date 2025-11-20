@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan Statistics | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <h2 class="mb-4">Loan Statistics</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stats-card success p-3 rounded">
+                    <div class="fw-bold">Total Loans</div>
+                    <div class="fs-3">{{ total_loans }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card p-3 rounded">
+                    <div class="fw-bold">Approved</div>
+                    <div class="fs-3">{{ approved_loans }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card warning p-3 rounded">
+                    <div class="fw-bold">Pending</div>
+                    <div class="fs-3">{{ pending_loans }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card danger p-3 rounded">
+                    <div class="fw-bold">Rejected</div>
+                    <div class="fs-3">{{ rejected_loans }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Amounts</h5>
+                <p class="mb-1"><strong>Total Approved Amount:</strong> ₹{{ total_amount_approved }}</p>
+                <p class="mb-0"><strong>Total Pending Amount:</strong> ₹{{ total_amount_pending }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

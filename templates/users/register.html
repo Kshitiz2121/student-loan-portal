@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Student Loan Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold">
+                    <i class="bi bi-person-plus me-2 text-primary"></i>Create Your Account
+                </h2>
+                <p class="lead text-muted">
+                    Choose your profile type and join our student loan platform
+                </p>
+            </div>
+
+            <!-- Profile Type Selection -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <ul class="nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active text-white" id="student-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#student" type="button" role="tab" aria-controls="student" 
+                                    aria-selected="true">
+                                <i class="bi bi-mortarboard me-2"></i>Student
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-white" id="financier-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#financier" type="button" role="tab" aria-controls="financier" 
+                                    aria-selected="false">
+                                <i class="bi bi-bank me-2"></i>Financier
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="tab-content" id="profileTabsContent">
+                        <!-- Student Registration Tab -->
+                        <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
+                            <div class="text-center mb-4">
+                                <i class="bi bi-mortarboard display-4 text-primary mb-3"></i>
+                                <h4>Student Registration</h4>
+                                <p class="text-muted">Apply for student loans to fund your education</p>
+                            </div>
+                            
+                            <form method="post" id="studentForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="student">
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_first_name" class="form-label">First Name *</label>
+                                        <input type="text" class="form-control" id="id_first_name" name="first_name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_last_name" class="form-label">Last Name *</label>
+                                        <input type="text" class="form-control" id="id_last_name" name="last_name" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_email" class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" id="id_email" name="email" required>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_student_id" class="form-label">Student ID *</label>
+                                        <input type="text" class="form-control" id="id_student_id" name="student_id" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_university" class="form-label">University *</label>
+                                        <select class="form-select" id="id_university" name="university" required>
+                                            <option value="">Select University</option>
+                                            <option value="Indian Institute of Technology Bombay">IIT Bombay</option>
+                                            <option value="Indian Institute of Technology Delhi">IIT Delhi</option>
+                                            <option value="Indian Institute of Technology Madras">IIT Madras</option>
+                                            <option value="Indian Institute of Technology Kanpur">IIT Kanpur</option>
+                                            <option value="Indian Institute of Technology Kharagpur">IIT Kharagpur</option>
+                                            <option value="Indian Institute of Technology Roorkee">IIT Roorkee</option>
+                                            <option value="Indian Institute of Science Bangalore">IISc Bangalore</option>
+                                            <option value="University of Delhi">University of Delhi</option>
+                                            <option value="Jawaharlal Nehru University">JNU</option>
+                                            <option value="University of Mumbai">University of Mumbai</option>
+                                            <option value="Savitribai Phule Pune University">Pune University</option>
+                                            <option value="University of Calcutta">University of Calcutta</option>
+                                            <option value="University of Madras">University of Madras</option>
+                                            <option value="Banaras Hindu University">BHU</option>
+                                            <option value="Birla Institute of Technology and Science Pilani">BITS Pilani</option>
+                                            <option value="National Institute of Technology Trichy">NIT Trichy</option>
+                                            <option value="National Institute of Technology Warangal">NIT Warangal</option>
+                                            <option value="Vellore Institute of Technology">VIT</option>
+                                            <option value="Anna University">Anna University</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_gpa" class="form-label">GPA *</label>
+                                        <input type="number" class="form-control" id="id_gpa" name="gpa" 
+                                               step="0.01" min="0.00" max="10.00" required>
+                                        <div class="form-text">Must be between 0.00 and 10.00</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_phone_number" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="id_phone_number" name="phone_number">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_address" class="form-label">Address</label>
+                                    <textarea class="form-control" id="id_address" name="address" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_date_of_birth" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="id_date_of_birth" name="date_of_birth">
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_password1" class="form-label">Password *</label>
+                                        <input type="password" class="form-control" id="id_password1" name="password1" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_password2" class="form-label">Confirm Password *</label>
+                                        <input type="password" class="form-control" id="id_password2" name="password2" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-person-plus me-2"></i>Register as Student
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Financier Registration Tab -->
+                        <div class="tab-pane fade" id="financier" role="tabpanel" aria-labelledby="financier-tab">
+                            <div class="text-center mb-4">
+                                <i class="bi bi-bank display-4 text-success mb-3"></i>
+                                <h4>Financier Registration</h4>
+                                <p class="text-muted">Invest in student loans and earn 2% interest monthly</p>
+                            </div>
+                            
+                            <form method="post" id="financierForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="financier">
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="financier_first_name" class="form-label">First Name *</label>
+                                        <input type="text" class="form-control" id="financier_first_name" name="first_name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="financier_last_name" class="form-label">Last Name *</label>
+                                        <input type="text" class="form-control" id="financier_last_name" name="last_name" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="financier_email" class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" id="financier_email" name="email" required>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="financier_phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="financier_phone" name="phone_number">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="financier_dob" class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" id="financier_dob" name="date_of_birth">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="financier_address" class="form-label">Address</label>
+                                    <textarea class="form-control" id="financier_address" name="address" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="financier_password1" class="form-label">Password *</label>
+                                        <input type="password" class="form-control" id="financier_password1" name="password1" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="financier_password2" class="form-label">Confirm Password *</label>
+                                        <input type="password" class="form-control" id="financier_password2" name="password2" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="bi bi-bank me-2"></i>Register as Financier
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Information Cards -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-primary h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-mortarboard me-2"></i>For Students
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="bi bi-check text-primary me-2"></i>
+                                    Quick loan approval (GPA ≥ 6.0)
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check text-primary me-2"></i>
+                                    Competitive interest rates
+                                </li>
+                                <li class="mb-0">
+                                    <i class="bi bi-check text-primary me-2"></i>
+                                    Flexible repayment terms
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card border-success h-100">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">
+                                <i class="bi bi-bank me-2"></i>For Financiers
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="bi bi-check text-success me-2"></i>
+                                    Earn 2% monthly interest
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check text-success me-2"></i>
+                                    Diversified student loan portfolio
+                                </li>
+                                <li class="mb-0">
+                                    <i class="bi bi-check text-success me-2"></i>
+                                    Secure investment platform
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Login Link -->
+            <div class="text-center mt-4">
+                <p class="mb-0">
+                    Already have an account? 
+                    <a href="{% url 'users:login' %}" class="text-decoration-none">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle form submissions
+    document.getElementById('studentForm').addEventListener('submit', function(e) {
+        // Add form type to student form
+        const formTypeInput = document.createElement('input');
+        formTypeInput.type = 'hidden';
+        formTypeInput.name = 'form_type';
+        formTypeInput.value = 'student';
+        this.appendChild(formTypeInput);
+    });
+    
+    document.getElementById('financierForm').addEventListener('submit', function(e) {
+        // Add form type to financier form
+        const formTypeInput = document.createElement('input');
+        formTypeInput.type = 'hidden';
+        formTypeInput.name = 'form_type';
+        formTypeInput.value = 'financier';
+        this.appendChild(formTypeInput);
+    });
+    
+    // Tab switching
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            // Reset forms when switching tabs
+            document.getElementById('studentForm').reset();
+            document.getElementById('financierForm').reset();
+        });
+    });
+</script>
+{% endblock %}

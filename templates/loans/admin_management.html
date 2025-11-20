@@ -1,0 +1,427 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Loan Management - Student Loan Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="display-5 fw-bold">
+                        <i class="bi bi-gear me-2 text-primary"></i>Loan Management Dashboard
+                    </h2>
+                    <p class="lead text-muted">Manage all student loan applications and approvals</p>
+                </div>
+                <div>
+                    <a href="{% url 'loans:statistics' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-graph-up me-2"></i>View Statistics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2 mb-3">
+            <div class="card stats-card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-list-ul display-6 mb-2"></i>
+                    <h3 class="card-title">{{ total_loans }}</h3>
+                    <p class="card-text">Total Loans</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2 mb-3">
+            <div class="card stats-card warning text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-clock display-6 mb-2"></i>
+                    <h3 class="card-title">{{ pending_loans }}</h3>
+                    <p class="card-text">Pending</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2 mb-3">
+            <div class="card stats-card success text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-check-circle display-6 mb-2"></i>
+                    <h3 class="card-title">{{ approved_loans }}</h3>
+                    <p class="card-text">Approved</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2 mb-3">
+            <div class="card stats-card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-x-circle display-6 mb-2"></i>
+                    <h3 class="card-title">{{ rejected_loans }}</h3>
+                    <p class="card-text">Rejected</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2 mb-3">
+            <div class="card stats-card danger text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-exclamation-triangle display-6 mb-2"></i>
+                    <h3 class="card-title">{{ overdue_loans }}</h3>
+                    <p class="card-text">Overdue</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-2 mb-3">
+            <div class="card bg-info text-white text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-currency-rupee display-6 mb-2"></i>
+                    <h3 class="card-title">₹{{ total_amount_pending|floatformat:0 }}</h3>
+                    <p class="card-text">Pending Amount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <label for="search" class="form-label">Search</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search_query }}" placeholder="Search by student name, ID, or reason">
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">All Statuses</option>
+                        {% for status, label in status_choices %}
+                            <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search me-2"></i>Search
+                    </button>
+                    <a href="{% url 'loans:admin_management' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loans Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-table me-2"></i>Loan Applications
+                <span class="badge bg-primary ms-2">{{ loans|length }}</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if loans %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Student</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Due Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in loans %}
+                            <tr>
+                                <td>
+                                    <strong>#{{ loan.id }}</strong>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ loan.student.get_full_name }}</strong><br>
+                                        <small class="text-muted">
+                                            {{ loan.student.student_id }} | {{ loan.student.university }}
+                                        </small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">₹{{ loan.amount }}</span>
+                                </td>
+                                <td>
+                                    {% if loan.status == 'Approved' %}
+                                        <span class="badge bg-success">{{ loan.status }}</span>
+                                    {% elif loan.status == 'Pending' %}
+                                        <span class="badge bg-warning">{{ loan.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{{ loan.status }}</span>
+                                    {% endif %}
+                                    
+                                    {% if loan.is_overdue and loan.status == 'Approved' %}
+                                        <br><span class="badge bg-danger mt-1">OVERDUE</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ loan.created_at|date:"M d, Y" }}</small><br>
+                                    <small class="text-muted">{{ loan.created_at|date:"H:i" }}</small>
+                                </td>
+                                <td>
+                                    {% if loan.repayment_due_date %}
+                                        <small>{{ loan.repayment_due_date|date:"M d, Y" }}</small>
+                                        {% if loan.days_until_due is not None %}
+                                            <br>
+                                            {% if loan.days_until_due > 0 %}
+                                                <small class="text-success">{{ loan.days_until_due }} days left</small>
+                                            {% else %}
+                                                <small class="text-danger">{{ loan.days_overdue }} days overdue</small>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% else %}
+                                        <small class="text-muted">Not set</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'loans:detail' loan.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        
+                                        {% if loan.status == 'Pending' %}
+                                            <button type="button" class="btn btn-sm btn-success" 
+                                                    onclick="approveLoan({{ loan.id }})">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="rejectLoan({{ loan.id }})">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        {% endif %}
+                                        
+                                        <button type="button" class="btn btn-sm btn-outline-info" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#loanModal{{ loan.id }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if loans.has_other_pages %}
+                <nav aria-label="Loan applications pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if loans.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ loans.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in loans.paginator.page_range %}
+                            {% if loans.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > loans.number|add:'-3' and num < loans.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if loans.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ loans.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ loans.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <h5 class="mt-3">No loan applications found</h5>
+                    <p class="text-muted">Try adjusting your search criteria or check back later.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Loan Detail Modals -->
+{% for loan in loans %}
+<div class="modal fade" id="loanModal{{ loan.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Loan #{{ loan.id }} - {{ loan.student.get_full_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Student Information</h6>
+                        <p><strong>Name:</strong> {{ loan.student.get_full_name }}</p>
+                        <p><strong>Student ID:</strong> {{ loan.student.student_id }}</p>
+                        <p><strong>University:</strong> {{ loan.student.university }}</p>
+                        <p><strong>GPA:</strong> {{ loan.student.gpa }}</p>
+                        <p><strong>Email:</strong> {{ loan.student.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Loan Details</h6>
+                        <p><strong>Amount:</strong> ₹{{ loan.amount }}</p>
+                        <p><strong>Status:</strong> 
+                            {% if loan.status == 'Approved' %}
+                                <span class="badge bg-success">{{ loan.status }}</span>
+                            {% elif loan.status == 'Pending' %}
+                                <span class="badge bg-warning">{{ loan.status }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ loan.status }}</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Created:</strong> {{ loan.created_at|date:"F d, Y H:i" }}</p>
+                        <p><strong>Due Date:</strong> 
+                            {% if loan.repayment_due_date %}
+                                {{ loan.repayment_due_date|date:"F d, Y" }}
+                            {% else %}
+                                Not set
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <h6>Reason for Loan</h6>
+                    <p class="text-muted">{{ loan.reason }}</p>
+                </div>
+                
+                {% if loan.admin_notes %}
+                <div class="mb-3">
+                    <h6>Admin Notes</h6>
+                    <p class="text-muted">{{ loan.admin_notes }}</p>
+                </div>
+                {% endif %}
+                
+                {% if loan.status == 'Approved' %}
+                <div class="alert alert-info">
+                    <h6>Repayment Information</h6>
+                    <p><strong>Total Amount Due:</strong> ₹{{ loan.total_amount_due|floatformat:2 }}</p>
+                    <p><strong>Interest Rate:</strong> {{ loan.interest_rate }}% annually</p>
+                    {% if loan.is_overdue %}
+                        <p class="text-danger"><strong>Status:</strong> OVERDUE</p>
+                    {% else %}
+                        <p><strong>Days Until Due:</strong> {{ loan.days_until_due }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                {% if loan.status == 'Pending' %}
+                    <button type="button" class="btn btn-success" onclick="approveLoan({{ loan.id }})">
+                        <i class="bi bi-check me-2"></i>Approve
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="rejectLoan({{ loan.id }})">
+                        <i class="bi bi-x me-2"></i>Reject
+                    </button>
+                {% endif %}
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Approve loan function
+    function approveLoan(loanId) {
+        if (confirm('Are you sure you want to approve this loan application?')) {
+            fetch(`/loans/api/approve/${loanId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing the request.');
+            });
+        }
+    }
+
+    // Reject loan function
+    function rejectLoan(loanId) {
+        if (confirm('Are you sure you want to reject this loan application?')) {
+            fetch(`/loans/api/reject/${loanId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing the request.');
+            });
+        }
+    }
+
+    // Auto-refresh every 30 seconds
+    setInterval(function() {
+        // Only refresh if no modals are open
+        if (document.querySelectorAll('.modal.show').length === 0) {
+            location.reload();
+        }
+    }, 30000);
+</script>
+{% endblock %}

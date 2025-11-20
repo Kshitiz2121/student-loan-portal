@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Repayment Statistics | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <h2 class="mb-4">Repayment Statistics</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stats-card success p-3 rounded">
+                    <div class="fw-bold">Total Repayments</div>
+                    <div class="fs-3">{{ total_repayments }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card p-3 rounded">
+                    <div class="fw-bold">Paid</div>
+                    <div class="fs-3">{{ paid_repayments }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card warning p-3 rounded">
+                    <div class="fw-bold">Pending</div>
+                    <div class="fs-3">{{ pending_repayments }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card danger p-3 rounded">
+                    <div class="fw-bold">Failed</div>
+                    <div class="fs-3">{{ failed_repayments }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Total Amount Paid</h5>
+                <p class="mb-0">₹{{ total_amount_paid }}</p>
+            </div>
+        </div>
+
+        {% if payment_method_stats %}
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">By Payment Method</h5>
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Count</th>
+                                    <th>Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in payment_method_stats %}
+                                    <tr>
+                                        <td>{{ row.payment_method }}</td>
+                                        <td>{{ row.count }}</td>
+                                        <td>₹{{ row.total_amount }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Repayment History | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <h2 class="mb-4">Repayment History</h2>
+        <div class="card">
+            <div class="card-body">
+                {% if repayments %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Loan</th>
+                                    <th>Amount Paid</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for repayment in repayments %}
+                                    <tr>
+                                        <td>#{{ repayment.id }}</td>
+                                        <td>#{{ repayment.loan.id }}</td>
+                                        <td>₹{{ repayment.amount_paid }}</td>
+                                        <td><span class="badge bg-secondary">{{ repayment.status }}</span></td>
+                                        <td>{{ repayment.payment_date|date:'M d, Y' }}</td>
+                                        <td>
+                                            <a href="{% url 'repayments:detail' pk=repayment.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="mb-0">No repayments found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

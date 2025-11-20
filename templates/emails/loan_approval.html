@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .loan-details {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎉 Congratulations!</h1>
+        <h2>Your Loan Application Has Been Approved</h2>
+    </div>
+    
+    <div class="content">
+        <p>Dear {{ student.get_full_name }},</p>
+        
+        <p>We are pleased to inform you that your loan application has been <strong>approved</strong>!</p>
+        
+        <div class="loan-details">
+            <h3>Loan Details</h3>
+            <p><strong>Loan ID:</strong> #{{ loan.id }}</p>
+            <p><strong>Amount:</strong> <span class="amount">₹{{ loan.amount }}</span></p>
+            <p><strong>Total Amount Due:</strong> ₹{{ total_amount|floatformat:2 }}</p>
+            <p><strong>Monthly Payment:</strong> ₹{{ monthly_payment|floatformat:2 }}</p>
+            <p><strong>Due Date:</strong> {{ due_date|date:"F d, Y" }}</p>
+        </div>
+        
+        <p>Your loan has been processed and you can now access the funds. Please make sure to make timely repayments to maintain a good credit record.</p>
+        
+        <div style="text-align: center;">
+            <a href="{{ BASE_URL }}/loans/detail/{{ loan.id }}/" class="button">View Loan Details</a>
+        </div>
+        
+        <p><strong>Important Reminders:</strong></p>
+        <ul>
+            <li>Make payments on time to avoid late fees</li>
+            <li>Keep track of your repayment schedule</li>
+            <li>Contact us if you have any questions</li>
+        </ul>
+        
+        <p>Thank you for choosing our Student Loan Portal!</p>
+        
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>Student Loan Portal | support@studentloanportal.com</p>
+        </div>
+    </div>
+</body>
+</html>

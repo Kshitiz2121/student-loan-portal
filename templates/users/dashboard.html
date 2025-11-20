@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Student Loan Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="card-title mb-2 text-white">
+                                <i class="bi bi-house-heart me-2 text-primary"></i>
+                                Welcome back, {{ user.get_full_name }}!
+                            </h2>
+                            <p class="card-text text-muted mb-0">
+                                Student ID: {{ user.student_id }} | University: {{ user.university }} | GPA: {{ user.gpa }}
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            {% if user.is_eligible_for_loan %}
+                                <span class="badge bg-success fs-6">
+                                    <i class="bi bi-check-circle me-1"></i>Eligible for Loan
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning fs-6">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>GPA Below 6.0
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Reminders Section -->
+    {% if has_reminders %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <!-- Overdue Loans Alert -->
+                {% if overdue_loans %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>URGENT: Payment Overdue!</strong>
+                        </h5>
+                        <p class="mb-2">You have <strong>{{ overdue_loans|length }}</strong> loan(s) that are overdue. Please make payment immediately.</p>
+                        <div class="d-flex gap-2">
+                            {% for item in overdue_loans %}
+                                <a href="{% url 'repayments:create' item.loan.id %}" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-cash-stack me-1"></i>Pay Loan #{{ item.loan.id }} ({{ item.days_overdue }} days overdue)
+                                </a>
+                            {% endfor %}
+                            <a href="{% url 'repayments:list' %}" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-list me-1"></i>View All Repayments
+                            </a>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <!-- Upcoming Due Dates Alert -->
+                {% if upcoming_due_loans %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-clock-history me-2"></i>
+                            <strong>Payment Due Soon!</strong>
+                        </h5>
+                        <p class="mb-2">You have <strong>{{ upcoming_due_loans|length }}</strong> loan(s) due within the next 7 days.</p>
+                        <div class="d-flex gap-2">
+                            {% for item in upcoming_due_loans %}
+                                <a href="{% url 'repayments:create' item.loan.id %}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-cash-stack me-1"></i>Pay Loan #{{ item.loan.id }} ({{ item.days_until_due }} days left)
+                                </a>
+                            {% endfor %}
+                            <a href="{% url 'repayments:list' %}" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-list me-1"></i>View All Repayments
+                            </a>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <!-- Total Remaining Amount Reminder -->
+                {% if total_remaining > 0 %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Payment Reminder</strong>
+                        </h5>
+                        <p class="mb-0">
+                            <strong>Total Amount Remaining:</strong> <span class="fw-bold">₹{{ total_remaining|floatformat:2 }}</span>
+                            <a href="{% url 'repayments:list' %}" class="btn btn-sm btn-info ms-2">
+                                <i class="bi bi-arrow-right me-1"></i>Make Payment
+                            </a>
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-list-ul display-4 mb-2"></i>
+                    <h3 class="card-title">{{ total_loans }}</h3>
+                    <p class="card-text">Total Loans</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card success h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle display-4 mb-2"></i>
+                    <h3 class="card-title">{{ approved_loans }}</h3>
+                    <p class="card-text">Approved Loans</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card warning h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock display-4 mb-2"></i>
+                    <h3 class="card-title">{{ pending_loans }}</h3>
+                    <p class="card-text">Pending Loans</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-credit-card display-4 mb-2"></i>
+                    <h3 class="card-title">₹{{ total_paid|floatformat:0 }}</h3>
+                    <p class="card-text">Total Repaid</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Loan Section -->
+    {% if active_loan %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                    <h5 class="mb-0 text-dark">
+                        <i class="bi bi-info-circle me-2"></i>Active Loan Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-white">Loan #{{ active_loan.id }}</h6>
+                            <p class="mb-2 text-white">
+                                <strong>Amount:</strong> ₹{{ active_loan.amount }}<br>
+                                <strong>Status:</strong> 
+                                <span class="badge bg-success">{{ active_loan.status }}</span><br>
+                                <strong>Due Date:</strong> {{ active_loan.repayment_due_date|date:"F d, Y" }}<br>
+                                <strong>Total Due:</strong> ₹{{ active_loan.total_amount_due|floatformat:2 }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-white">Repayment Progress</h6>
+                            {% if active_loan.is_overdue %}
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    <strong>OVERDUE!</strong> Please make payment immediately.
+                                </div>
+                            {% else %}
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        {{ active_loan.days_until_due }} days until due
+                                    </small>
+                                </div>
+                            {% endif %}
+                            
+                            <a href="{% url 'repayments:create' active_loan.id %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Record Payment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-white">
+                        <i class="bi bi-lightning me-2 text-primary"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% if not user.has_active_loan and user.is_eligible_for_loan %}
+                            <div class="col-md-4">
+                                <a href="{% url 'loans:apply' %}" class="btn btn-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
+                                    <i class="bi bi-plus-circle display-6 mb-3"></i>
+                                    <span class="fs-5">Apply for Loan</span>
+                                </a>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="col-md-4">
+                            <a href="{% url 'loans:list' %}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
+                                <i class="bi bi-list-ul display-6 mb-3"></i>
+                                <span class="fs-5">View All Loans</span>
+                            </a>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <a href="{% url 'repayments:list' %}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4">
+                                <i class="bi bi-credit-card display-6 mb-3"></i>
+                                <span class="fs-5">Repayment History</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <!-- Recent Loans -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white">
+                        <i class="bi bi-list-ul me-2 text-primary"></i>Recent Loans
+                    </h5>
+                    <a href="{% url 'users:loan_history' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if loan_applications %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-white">Amount</th>
+                                        <th class="text-white">Status</th>
+                                        <th class="text-white">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for loan in loan_applications %}
+                                    <tr>
+                                        <td class="text-white">₹{{ loan.amount }}</td>
+                                        <td>
+                                            {% if loan.status == 'Approved' %}
+                                                <span class="badge bg-success">{{ loan.status }}</span>
+                                            {% elif loan.status == 'Pending' %}
+                                                <span class="badge bg-warning">{{ loan.status }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ loan.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-white">{{ loan.created_at|date:"M d, Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No loans yet. 
+                            <a href="{% url 'loans:apply' %}" class="text-primary">Apply for your first loan!</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Repayments -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white">
+                        <i class="bi bi-credit-card me-2 text-success"></i>Recent Repayments
+                    </h5>
+                    <a href="{% url 'users:repayment_history' %}" class="btn btn-sm btn-outline-success">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if repayments %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-white">Amount</th>
+                                        <th class="text-white">Status</th>
+                                        <th class="text-white">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for repayment in repayments %}
+                                    <tr>
+                                        <td class="text-white">₹{{ repayment.amount_paid }}</td>
+                                        <td>
+                                            {% if repayment.status == 'Paid' %}
+                                                <span class="badge bg-success">{{ repayment.status }}</span>
+                                            {% elif repayment.status == 'Pending' %}
+                                                <span class="badge bg-warning">{{ repayment.status }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ repayment.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-white">{{ repayment.payment_date|date:"M d, Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No repayments yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh dashboard data every 30 seconds
+    setInterval(function() {
+        // Refresh repayment summary
+        $.get("{% url 'users:repayment_summary_api' %}", function(data) {
+            if (data.success && data.data.has_active_loan) {
+                // Update active loan information if needed
+                location.reload();
+            }
+        });
+    }, 30000);
+</script>
+{% endblock %}

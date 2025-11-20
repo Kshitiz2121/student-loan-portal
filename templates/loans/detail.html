@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan #{{ loan.id }} | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Loan #{{ loan.id }}</h2>
+            <a href="{% url 'loans:list' %}" class="btn btn-outline-secondary">Back to Loans</a>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Details</h5>
+                        <p class="mb-1"><strong>Amount:</strong> ₹{{ loan.amount }}</p>
+                        <p class="mb-1"><strong>Status:</strong> <span class="badge bg-secondary">{{ loan.status }}</span></p>
+                        <p class="mb-1"><strong>Reason:</strong> {{ loan.reason|default:'-' }}</p>
+                        <p class="mb-1"><strong>Applied On:</strong> {{ loan.created_at|date:'M d, Y' }}</p>
+                        <p class="mb-1"><strong>Due Date:</strong> {{ loan.repayment_due_date|date:'M d, Y'|default:'-' }}</p>
+                        <p class="mb-1"><strong>Repayment Months:</strong> {{ loan.repayment_months }}</p>
+                        <p class="mb-1"><strong>Total Interest (10%/mo simple):</strong> ₹{{ loan.total_interest|floatformat:2 }}</p>
+                        <p class="mb-1"><strong>Total Amount Due:</strong> ₹{{ loan.total_amount_due|floatformat:2 }}</p>
+                        <p class="mb-1"><strong>Monthly Payment:</strong> ₹{{ loan.monthly_payment|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Repayments</h5>
+                        {% if repayments %}
+                            <ul class="list-group list-group-flush">
+                                {% for r in repayments %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>₹{{ r.amount_paid }} on {{ r.payment_date|date:'M d, Y' }}</span>
+                                        <span class="badge bg-secondary">{{ r.status }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="mb-0">No repayments yet.</p>
+                        {% endif %}
+                        {% if loan.status == 'Approved' %}
+                            <a href="{% url 'repayments:create' loan_id=loan.id %}" class="btn btn-primary mt-3">Record Repayment</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

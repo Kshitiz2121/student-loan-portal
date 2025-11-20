@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Student Loan Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 fade-in-up">
+                <h1 class="display-4 fw-bold mb-4 text-white">
+                    Student Loans Made Simple
+                </h1>
+                <p class="lead mb-4 text-white-75">
+                    Get the financial support you need for your education. Our student loan portal offers 
+                    quick applications, competitive rates, and flexible repayment options.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'loans:apply' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle me-2"></i>Apply Now
+                        </a>
+                        <a href="{% url 'users:dashboard' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-house me-2"></i>Go to Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Get Started
+                        </a>
+                        <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center fade-in-up">
+                <div class="position-relative">
+                    <i class="bi bi-mortarboard display-1 text-primary" style="filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.3));"></i>
+                    <div class="position-absolute top-0 start-50 translate-middle">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold text-white">Why Choose Our Student Loan Portal?</h2>
+                <p class="lead text-muted">We're committed to making education accessible for every student</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 fade-in-up">
+                    <div class="card-body">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-lightning-charge display-4 text-primary"></i>
+                        </div>
+                        <h5 class="card-title text-white">Quick & Easy Application</h5>
+                        <p class="card-text text-muted">
+                            Complete your loan application in minutes with our streamlined process. 
+                            No complicated paperwork or long waiting times.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 fade-in-up">
+                    <div class="card-body">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-shield-check display-4 text-success"></i>
+                        </div>
+                        <h5 class="card-title text-white">Secure & Reliable</h5>
+                        <p class="card-text text-muted">
+                            Your personal information is protected with bank-level security. 
+                            We use industry-standard encryption to keep your data safe.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 fade-in-up">
+                    <div class="card-body">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-graph-up display-4 text-warning"></i>
+                        </div>
+                        <h5 class="card-title text-white">Competitive Rates</h5>
+                        <p class="card-text text-muted">
+                            Enjoy some of the most competitive interest rates in the market. 
+                            We believe education should be affordable for everyone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loan Details Section -->
+<section class="py-5" style="background: var(--dark-surface);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 fade-in-up">
+                <h2 class="display-6 fw-bold mb-4 text-white">Loan Details</h2>
+                <ul class="list-unstyled">
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                        <div>
+                            <strong class="text-white">Loan Amount:</strong> 
+                            <span class="text-muted">₹500 - ₹5,000 INR</span>
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                        <div>
+                            <strong class="text-white">Interest Rate:</strong> 
+                            <span class="text-muted">Starting from 5% annually</span>
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                        <div>
+                            <strong class="text-white">Repayment Period:</strong> 
+                            <span class="text-muted">Up to 6 months</span>
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                        <div>
+                            <strong class="text-white">Eligibility:</strong> 
+                            <span class="text-muted">GPA 6.0+ and enrolled student</span>
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i>
+                        <div>
+                            <strong class="text-white">Processing Time:</strong> 
+                            <span class="text-muted">Instant approval for eligible students</span>
+                        </div>
+                    </li>
+                </ul>
+                
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>Apply Now
+                    </a>
+                {% endif %}
+            </div>
+            
+            <div class="col-lg-6 fade-in-up">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-4 text-white">
+                            <i class="bi bi-calculator me-2 text-primary"></i>Loan Calculator
+                        </h5>
+                        <div class="mb-3">
+                            <label class="form-label text-white">Loan Amount (INR)</label>
+                            <input type="range" class="form-range" id="loanAmount" min="500" max="5000" value="2500" step="100" style="background: var(--dark-surface-2);">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">₹500</small>
+                                <span id="amountDisplay" class="fw-bold text-primary">₹2,500</span>
+                                <small class="text-muted">₹5,000</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-white">Interest Rate: 5% annually</label>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center p-3 rounded" style="background: var(--dark-surface-2);">
+                                    <h6 class="mb-1 text-white">Monthly Payment</h6>
+                                    <span id="monthlyPayment" class="fw-bold text-primary">₹0</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-3 rounded" style="background: var(--dark-surface-2);">
+                                    <h6 class="mb-1 text-white">Total Interest</h6>
+                                    <span id="totalInterest" class="fw-bold text-warning">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-6 fw-bold text-white">How It Works</h2>
+                <p class="lead text-muted">Get your student loan in just 3 simple steps</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4 text-center fade-in-up">
+                <div class="position-relative">
+                    <div class="bg-primary text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);">
+                        <span class="h4 mb-0 fw-bold">1</span>
+                    </div>
+                    <h5 class="text-white">Register & Verify</h5>
+                    <p class="text-muted">Create your account and verify your student credentials with your university details.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 text-center fade-in-up">
+                <div class="position-relative">
+                    <div class="bg-primary text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);">
+                        <span class="h4 mb-0 fw-bold">2</span>
+                    </div>
+                    <h5 class="text-white">Apply for Loan</h5>
+                    <p class="text-muted">Fill out the simple application form with your loan amount and reason for borrowing.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 text-center fade-in-up">
+                <div class="position-relative">
+                    <div class="bg-primary text-dark rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);">
+                        <span class="h4 mb-0 fw-bold">3</span>
+                    </div>
+                    <h5 class="text-white">Get Approved</h5>
+                    <p class="text-muted">Receive instant approval if eligible, or wait for admin review within 24 hours.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+    <div class="container text-center">
+        <h2 class="display-6 fw-bold mb-4 text-dark">Ready to Get Started?</h2>
+        <p class="lead mb-4 text-dark">
+            Join thousands of students who have already benefited from our student loan program.
+        </p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'loans:apply' %}" class="btn btn-dark btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>Apply for Loan
+            </a>
+        {% else %}
+            <a href="{% url 'users:register' %}" class="btn btn-dark btn-lg me-3">
+                <i class="bi bi-person-plus me-2"></i>Get Started
+            </a>
+            <a href="{% url 'users:login' %}" class="btn btn-outline-dark btn-lg">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+            </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+    
+    .feature-icon {
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-icon:hover {
+        transform: scale(1.1);
+    }
+    
+    .form-range::-webkit-slider-thumb {
+        background: var(--primary-color);
+        border: 2px solid var(--dark-bg);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    }
+    
+    .form-range::-moz-range-thumb {
+        background: var(--primary-color);
+        border: 2px solid var(--dark-bg);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    }
+    
+    .btn-dark {
+        background: var(--dark-bg);
+        border: 2px solid var(--dark-bg);
+        color: var(--text-primary);
+    }
+    
+    .btn-dark:hover {
+        background: var(--dark-surface);
+        border-color: var(--dark-surface);
+        color: var(--text-primary);
+    }
+    
+    .btn-outline-dark {
+        border: 2px solid var(--dark-bg);
+        color: var(--dark-bg);
+        background: transparent;
+    }
+    
+    .btn-outline-dark:hover {
+        background: var(--dark-bg);
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Loan Calculator
+    const loanAmount = document.getElementById('loanAmount');
+    const amountDisplay = document.getElementById('amountDisplay');
+    const monthlyPayment = document.getElementById('monthlyPayment');
+    const totalInterest = document.getElementById('totalInterest');
+    
+    function updateCalculator() {
+        const amount = parseInt(loanAmount.value);
+        const interestRate = 5; // 5% annually
+        const months = 6; // 6 months
+        
+        // Calculate monthly interest rate
+        const monthlyRate = interestRate / 100 / 12;
+        
+        // Calculate monthly payment using loan amortization formula
+        const monthlyPaymentAmount = (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) / 
+                                   (Math.pow(1 + monthlyRate, months) - 1);
+        
+        // Calculate total interest
+        const totalInterestAmount = (monthlyPaymentAmount * months) - amount;
+        
+        // Update display
+        amountDisplay.textContent = `₹${amount.toLocaleString()}`;
+        monthlyPayment.textContent = `₹${monthlyPaymentAmount.toFixed(0)}`;
+        totalInterest.textContent = `₹${totalInterestAmount.toFixed(0)}`;
+    }
+    
+    loanAmount.addEventListener('input', updateCalculator);
+    updateCalculator(); // Initial calculation
+    
+    // Add animation on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all fade-in-up elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Repayment #{{ repayment.id }} | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Repayment #{{ repayment.id }}</h2>
+            <a href="{% url 'repayments:list' %}" class="btn btn-outline-secondary">Back to Repayments</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <p class="mb-1"><strong>Loan:</strong> #{{ loan.id }}</p>
+                <p class="mb-1"><strong>Amount Paid:</strong> ₹{{ repayment.amount_paid }}</p>
+                <p class="mb-1"><strong>Status:</strong> <span class="badge bg-secondary">{{ repayment.status }}</span></p>
+                <p class="mb-1"><strong>Date:</strong> {{ repayment.payment_date|date:'M d, Y' }}</p>
+                <p class="mb-1"><strong>Method:</strong> {{ repayment.payment_method|default:'Manual Entry' }}</p>
+                <p class="mb-0"><strong>Transaction ID:</strong> {{ repayment.transaction_id|default:'-' }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

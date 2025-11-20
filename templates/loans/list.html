@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}My Loans | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0 text-white">Loans</h2>
+            <a href="{% url 'loans:apply' %}" class="btn btn-primary">Apply for Loan</a>
+        </div>
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-6">
+                <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="Search by name, student id, reason">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    {% for value,label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100" type="submit">Filter</button>
+            </div>
+        </form>
+
+        <div class="card">
+            <div class="card-body">
+                {% if page_obj and page_obj.object_list %}
+                    <div class="table-responsive">
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th class="text-white">ID</th>
+                                    <th class="text-white">Amount</th>
+                                    <th class="text-white">Status</th>
+                                    <th class="text-white">Applied On</th>
+                                    <th class="text-white">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loan in page_obj %}
+                                    <tr>
+                                        <td class="text-white">#{{ loan.id }}</td>
+                                        <td class="text-white">₹{{ loan.amount }}</td>
+                                        <td>
+                                            {% if loan.status == 'Approved' %}
+                                                <span class="badge bg-success">{{ loan.status }}</span>
+                                            {% elif loan.status == 'Pending' %}
+                                                <span class="badge bg-warning">{{ loan.status }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ loan.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-white">{{ loan.created_at|date:'M d, Y' }}</td>
+                                        <td>
+                                            <a href="{% url 'loans:detail' pk=loan.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <nav>
+                        <ul class="pagination mb-0">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}">Previous</a></li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+                            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}">Next</a></li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% else %}
+                    <p class="mb-0 text-white">No loans found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

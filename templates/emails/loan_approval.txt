@@ -1,0 +1,27 @@
+CONGRATULATIONS! Your Loan Application Has Been Approved
+
+Dear {{ student.get_full_name }},
+
+We are pleased to inform you that your loan application has been APPROVED!
+
+LOAN DETAILS:
+- Loan ID: #{{ loan.id }}
+- Amount: ₹{{ loan.amount }}
+- Total Amount Due: ₹{{ total_amount|floatformat:2 }}
+- Monthly Payment: ₹{{ monthly_payment|floatformat:2 }}
+- Due Date: {{ due_date|date:"F d, Y" }}
+
+Your loan has been processed and you can now access the funds. Please make sure to make timely repayments to maintain a good credit record.
+
+View your loan details: {{ BASE_URL }}/loans/detail/{{ loan.id }}/
+
+IMPORTANT REMINDERS:
+- Make payments on time to avoid late fees
+- Keep track of your repayment schedule
+- Contact us if you have any questions
+
+Thank you for choosing our Student Loan Portal!
+
+---
+This is an automated message. Please do not reply to this email.
+Student Loan Portal | support@studentloanportal.com

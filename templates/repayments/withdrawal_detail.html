@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}Withdrawal Details - Student Loan Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold text-white">
+                    <i class="bi bi-cash-stack me-2 text-success"></i>Withdrawal Details
+                </h2>
+                <p class="lead text-muted">
+                    Detailed information about your withdrawal request.
+                </p>
+            </div>
+
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="{% url 'repayments:withdrawal_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Withdrawal List
+                </a>
+            </div>
+
+            <!-- Withdrawal Information -->
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Main Details Card -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                            <h5 class="mb-0 text-dark">
+                                <i class="bi bi-info-circle me-2"></i>Withdrawal Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-white">Withdrawal ID</h6>
+                                    <p class="mb-0">#{{ withdrawal.id }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-white">Amount</h6>
+                                    <p class="mb-0 fw-bold text-success">₹{{ withdrawal.amount|floatformat:2 }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-white">Withdrawal Method</h6>
+                                    <p class="mb-0">
+                                        <span class="badge bg-info">{{ withdrawal.withdrawal_method }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-white">Status</h6>
+                                    <p class="mb-0">
+                                        {% if withdrawal.status == 'Pending' %}
+                                            <span class="badge bg-warning">{{ withdrawal.status }}</span>
+                                        {% elif withdrawal.status == 'Processing' %}
+                                            <span class="badge bg-primary">{{ withdrawal.status }}</span>
+                                        {% elif withdrawal.status == 'Completed' %}
+                                            <span class="badge bg-success">{{ withdrawal.status }}</span>
+                                        {% elif withdrawal.status == 'Failed' %}
+                                            <span class="badge bg-danger">{{ withdrawal.status }}</span>
+                                        {% elif withdrawal.status == 'Cancelled' %}
+                                            <span class="badge bg-secondary">{{ withdrawal.status }}</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6 class="text-white">Requested Date</h6>
+                                    <p class="mb-0">{{ withdrawal.created_at|date:"F d, Y" }} at {{ withdrawal.created_at|time:"H:i" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {% if withdrawal.processed_at %}
+                                        <h6 class="text-white">Processed Date</h6>
+                                        <p class="mb-0">{{ withdrawal.processed_at|date:"F d, Y" }} at {{ withdrawal.processed_at|time:"H:i" }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Details Card -->
+                    {% if withdrawal.withdrawal_method == 'Bank Transfer' or withdrawal.withdrawal_method == 'UPI' %}
+                        <div class="card shadow mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--success-color) 0%, #00cc6a 100%);">
+                                <h5 class="mb-0 text-dark">
+                                    <i class="bi bi-bank me-2"></i>
+                                    {% if withdrawal.withdrawal_method == 'UPI' %}UPI Details{% else %}Bank Details{% endif %}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {% if withdrawal.withdrawal_method == 'UPI' %}
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <h6 class="text-white">UPI ID</h6>
+                                            <p class="mb-0">{{ withdrawal.masked_upi_id }}</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-white">Bank Name</h6>
+                                            <p class="mb-0">{{ withdrawal.bank_name }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-white">Account Holder Name</h6>
+                                            <p class="mb-0">{{ withdrawal.account_holder_name }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-white">Account Number</h6>
+                                            <p class="mb-0">{{ withdrawal.masked_account_number }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-white">IFSC Code</h6>
+                                            <p class="mb-0">{{ withdrawal.ifsc_code }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Processing Details -->
+                    {% if withdrawal.processed_by or withdrawal.transaction_id %}
+                        <div class="card shadow mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--warning-color) 0%, #e6a600 100%);">
+                                <h5 class="mb-0 text-dark">
+                                    <i class="bi bi-gear me-2"></i>Processing Details
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    {% if withdrawal.processed_by %}
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-white">Processed By</h6>
+                                            <p class="mb-0">{{ withdrawal.processed_by.get_full_name }}</p>
+                                        </div>
+                                    {% endif %}
+                                    {% if withdrawal.transaction_id %}
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-white">Transaction ID</h6>
+                                            <p class="mb-0">{{ withdrawal.transaction_id }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Notes -->
+                    {% if withdrawal.notes %}
+                        <div class="card shadow mb-4">
+                            <div class="card-header" style="background: linear-gradient(135deg, var(--info-color) 0%, #17a2b8 100%);">
+                                <h5 class="mb-0 text-dark">
+                                    <i class="bi bi-chat-text me-2"></i>Notes
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-0 text-white">{{ withdrawal.notes }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-md-4">
+                    <!-- Status Card -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                            <h5 class="mb-0 text-dark">
+                                <i class="bi bi-info-circle me-2"></i>Current Status
+                            </h5>
+                        </div>
+                        <div class="card-body text-center">
+                            {% if withdrawal.status == 'Pending' %}
+                                <i class="bi bi-hourglass-split display-4 text-warning"></i>
+                                <h4 class="text-warning mt-3">Pending Review</h4>
+                                <p class="text-muted">Your withdrawal request is being reviewed by our team.</p>
+                            {% elif withdrawal.status == 'Processing' %}
+                                <i class="bi bi-gear display-4 text-primary"></i>
+                                <h4 class="text-primary mt-3">Processing</h4>
+                                <p class="text-muted">Your withdrawal is being processed and will be completed soon.</p>
+                            {% elif withdrawal.status == 'Completed' %}
+                                <i class="bi bi-check-circle display-4 text-success"></i>
+                                <h4 class="text-success mt-3">Completed</h4>
+                                <p class="text-muted">Your withdrawal has been successfully processed.</p>
+                            {% elif withdrawal.status == 'Failed' %}
+                                <i class="bi bi-x-circle display-4 text-danger"></i>
+                                <h4 class="text-danger mt-3">Failed</h4>
+                                <p class="text-muted">Your withdrawal request could not be processed.</p>
+                            {% elif withdrawal.status == 'Cancelled' %}
+                                <i class="bi bi-dash-circle display-4 text-secondary"></i>
+                                <h4 class="text-secondary mt-3">Cancelled</h4>
+                                <p class="text-muted">Your withdrawal request has been cancelled.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--info-color) 0%, #17a2b8 100%);">
+                            <h5 class="mb-0 text-dark">
+                                <i class="bi bi-clock-history me-2"></i>Timeline
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="text-white">Request Submitted</h6>
+                                        <p class="text-muted mb-0">{{ withdrawal.created_at|date:"M d, Y H:i" }}</p>
+                                    </div>
+                                </div>
+                                {% if withdrawal.processed_at %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker bg-primary"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="text-white">Processing Started</h6>
+                                            <p class="text-muted mb-0">{{ withdrawal.processed_at|date:"M d, Y H:i" }}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if withdrawal.status == 'Completed' %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="text-white">Completed</h6>
+                                            <p class="text-muted mb-0">Withdrawal successful</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Support -->
+                    <div class="card shadow">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--warning-color) 0%, #e6a600 100%);">
+                            <h5 class="mb-0 text-dark">
+                                <i class="bi bi-headset me-2"></i>Need Help?
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">If you have any questions about this withdrawal, please contact our support team.</p>
+                            <a href="mailto:support@studentloanportal.com" class="btn btn-warning">
+                                <i class="bi bi-envelope me-2"></i>Contact Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -35px;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+    }
+    
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: -29px;
+        top: 12px;
+        width: 2px;
+        height: calc(100% + 8px);
+        background: #dee2e6;
+    }
+</style>
+{% endblock %}

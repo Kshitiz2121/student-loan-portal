@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Repayments | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0 text-white">
+                <i class="bi bi-credit-card me-2"></i>Repayments
+            </h2>
+        </div>
+
+        <!-- Payment Reminders Section -->
+        {% if not user.is_staff and has_reminders %}
+            <div class="mb-4">
+                <!-- Overdue Loans Alert -->
+                {% if overdue_loans %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>URGENT: Payment Overdue!</strong>
+                        </h5>
+                        <p class="mb-2">You have <strong>{{ overdue_loans|length }}</strong> loan(s) that are overdue. Please make payment immediately to avoid additional charges.</p>
+                        <hr>
+                        <div class="row">
+                            {% for item in overdue_loans %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="card border-danger">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-danger">
+                                                <i class="bi bi-calendar-x me-2"></i>Loan #{{ item.loan.id }}
+                                            </h6>
+                                            <p class="mb-1">
+                                                <strong>Overdue:</strong> <span class="text-danger">{{ item.days_overdue }} day(s)</span><br>
+                                                <strong>Due Date:</strong> {{ item.due_date|date:"M d, Y" }}<br>
+                                                <strong>Remaining:</strong> <span class="text-danger">₹{{ item.remaining_amount|floatformat:2 }}</span>
+                                            </p>
+                                            <a href="{% url 'repayments:create' item.loan.id %}" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-cash-stack me-1"></i>Pay Now
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <!-- Upcoming Due Dates Alert -->
+                {% if upcoming_due_loans %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-clock-history me-2"></i>
+                            <strong>Payment Due Soon!</strong>
+                        </h5>
+                        <p class="mb-2">You have <strong>{{ upcoming_due_loans|length }}</strong> loan(s) due within the next 7 days. Please make payment to avoid overdue charges.</p>
+                        <hr>
+                        <div class="row">
+                            {% for item in upcoming_due_loans %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="card border-warning">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-warning">
+                                                <i class="bi bi-calendar-check me-2"></i>Loan #{{ item.loan.id }}
+                                            </h6>
+                                            <p class="mb-1">
+                                                <strong>Days Left:</strong> <span class="text-warning">{{ item.days_until_due }} day(s)</span><br>
+                                                <strong>Due Date:</strong> {{ item.due_date|date:"M d, Y" }}<br>
+                                                <strong>Remaining:</strong> <span class="text-warning">₹{{ item.remaining_amount|floatformat:2 }}</span>
+                                            </p>
+                                            <a href="{% url 'repayments:create' item.loan.id %}" class="btn btn-warning btn-sm">
+                                                <i class="bi bi-cash-stack me-1"></i>Pay Now
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <!-- Total Remaining Amount Reminder -->
+                {% if total_remaining > 0 %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Payment Reminder</strong>
+                        </h5>
+                        <p class="mb-0">
+                            <strong>Total Amount Remaining:</strong> <span class="fw-bold">₹{{ total_remaining|floatformat:2 }}</span><br>
+                            <small class="text-muted">Please ensure timely payment to maintain your credit score and avoid late fees.</small>
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-5">
+                <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="Search by student name, id, transaction id, notes">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    {% for value,label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="payment_method" class="form-select">
+                    <option value="">All Methods</option>
+                    {% for value,label in payment_method_choices %}
+                        <option value="{{ value }}" {% if payment_method_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-outline-secondary w-100" type="submit">Filter</button>
+            </div>
+        </form>
+
+        <div class="card">
+            <div class="card-body">
+                {% if page_obj and page_obj.object_list %}
+                    <div class="table-responsive">
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th class="text-white">ID</th>
+                                    <th class="text-white">Loan</th>
+                                    <th class="text-white">Amount Paid</th>
+                                    <th class="text-white">Status</th>
+                                    <th class="text-white">Date</th>
+                                    <th class="text-white">Method</th>
+                                    <th class="text-white">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for repayment in page_obj %}
+                                    <tr>
+                                        <td class="text-white">#{{ repayment.id }}</td>
+                                        <td class="text-white">
+                                            #{{ repayment.loan.id }}
+                                            {% if not user.is_staff %}
+                                                {% if repayment.loan.is_overdue %}
+                                                    <span class="badge bg-danger ms-1" title="Overdue">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                    </span>
+                                                {% elif repayment.loan.days_until_due is not None and repayment.loan.days_until_due <= 7 %}
+                                                    <span class="badge bg-warning ms-1" title="Due Soon">
+                                                        <i class="bi bi-clock"></i>
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-white">₹{{ repayment.amount_paid|floatformat:2 }}</td>
+                                        <td>
+                                            {% if repayment.status == 'Paid' %}
+                                                <span class="badge bg-success">{{ repayment.status }}</span>
+                                            {% elif repayment.status == 'Pending' %}
+                                                <span class="badge bg-warning">{{ repayment.status }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ repayment.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-white">{{ repayment.payment_date|date:'M d, Y' }}</td>
+                                        <td class="text-white">{{ repayment.payment_method|default:'Manual Entry' }}</td>
+                                        <td>
+                                            <a href="{% url 'repayments:detail' pk=repayment.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye me-1"></i>View
+                                            </a>
+                                            {% if not user.is_staff and repayment.loan.status == 'Approved' and repayment.loan.is_overdue %}
+                                                <a href="{% url 'repayments:create' repayment.loan.id %}" class="btn btn-sm btn-danger ms-1" title="Pay Overdue Loan">
+                                                    <i class="bi bi-cash-stack me-1"></i>Pay Now
+                                                </a>
+                                            {% elif not user.is_staff and repayment.loan.status == 'Approved' and repayment.loan.days_until_due is not None and repayment.loan.days_until_due <= 7 %}
+                                                <a href="{% url 'repayments:create' repayment.loan.id %}" class="btn btn-sm btn-warning ms-1" title="Pay Due Soon">
+                                                    <i class="bi bi-cash-stack me-1"></i>Pay
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <nav>
+                        <ul class="pagination mb-0">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}&payment_method={{ payment_method_filter }}">Previous</a></li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+                            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}&payment_method={{ payment_method_filter }}">Next</a></li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% else %}
+                    <p class="mb-0 text-white">No repayments found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

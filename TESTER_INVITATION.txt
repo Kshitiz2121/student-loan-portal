@@ -1,0 +1,62 @@
+STUDENT LOAN PORTAL - TESTING INVITATION
+
+TESTING URL: http://192.168.1.7:8000
+
+TEST CREDENTIALS:
+
+Student Account 1:
+Email: student1@test.com
+Password: testpass123
+Name: Rahul Sharma
+
+Student Account 2:
+Email: student2@test.com
+Password: testpass123
+Name: Priya Patel
+
+Financier Account:
+Email: financier@test.com
+Password: testpass123
+Name: Amit Kumar
+
+Admin Account:
+Email: admin@test.com
+Password: admin123
+Name: Admin User
+
+HOW TO ACCESS:
+1. Open your web browser
+2. Go to: http://192.168.1.7:8000
+3. Use any of the credentials above to login
+4. Test the features!
+
+WHAT TO TEST:
+- Login with different user types
+- Apply for loans (as student)
+- Make repayments (try UPI and bank transfer)
+- Request withdrawals (as financier)
+- Manage loans (as admin)
+- Test on mobile phone
+
+MOBILE TESTING:
+- Connect to same WiFi network
+- Open browser on phone
+- Go to: http://192.168.1.7:8000
+- Test mobile features
+
+FEEDBACK NEEDED:
+1. Was it easy to use? (1-10 scale)
+2. What features did you like most?
+3. What was confusing or difficult?
+4. How was the mobile experience?
+5. Any suggestions for improvement?
+6. Any bugs or errors you found?
+
+IMPORTANT NOTES:
+- This is a TEST environment - don't use real money
+- All test payments are simulated
+- Make sure you're on the same WiFi network
+- Contact us if you encounter any issues
+
+Thank you for testing! Your feedback is valuable!
+

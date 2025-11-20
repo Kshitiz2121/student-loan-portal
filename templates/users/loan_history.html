@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan History | Student Loan Portal{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container">
+        <h2 class="mb-4">Loan History</h2>
+        <div class="card">
+            <div class="card-body">
+                {% if loan_applications %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Applied On</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loan in loan_applications %}
+                                    <tr>
+                                        <td>#{{ loan.id }}</td>
+                                        <td>₹{{ loan.amount }}</td>
+                                        <td><span class="badge bg-secondary">{{ loan.status }}</span></td>
+                                        <td>{{ loan.created_at|date:'M d, Y' }}</td>
+                                        <td>
+                                            <a href="{% url 'loans:detail' pk=loan.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="mb-0">No loans found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+

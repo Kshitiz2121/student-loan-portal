@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Withdrawal - Student Loan Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold text-white">
+                    <i class="bi bi-cash-stack me-2 text-success"></i>Request Withdrawal
+                </h2>
+                <p class="lead text-muted">
+                    Request a withdrawal of your earnings from the platform.
+                </p>
+            </div>
+
+            <!-- Account Balance Card -->
+            <div class="card border-success mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--success-color) 0%, #00cc6a 100%);">
+                    <h5 class="mb-0 text-dark">
+                        <i class="bi bi-wallet2 me-2"></i>Available Balance
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <h3 class="display-6 text-success mb-0">₹{{ available_balance|floatformat:2 }}</h3>
+                    <p class="text-muted mb-0">Available for withdrawal</p>
+                </div>
+            </div>
+
+            <!-- Withdrawal Form -->
+            <div class="card shadow">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                    <h5 class="mb-0 text-dark">
+                        <i class="bi bi-plus-circle me-2"></i>Withdrawal Details
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Amount -->
+                        <div class="mb-4">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label">
+                                <i class="bi bi-currency-rupee me-1"></i>Withdrawal Amount (INR) *
+                            </label>
+                            {{ form.amount }}
+                            {% if form.amount.errors %}
+                                <div class="text-danger small">{{ form.amount.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Minimum withdrawal amount: ₹100.00
+                            </div>
+                            
+                            <!-- Amount Slider -->
+                            <div class="mt-3">
+                                <input type="range" class="form-range" id="amountSlider" 
+                                       min="100" max="{{ available_balance }}" value="{{ available_balance|floatformat:2 }}" step="0.01">
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">₹100</small>
+                                    <span id="amountDisplay" class="fw-bold text-success">₹{{ available_balance|floatformat:2 }}</span>
+                                    <small class="text-muted">₹{{ available_balance|floatformat:2 }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Withdrawal Method -->
+                        <div class="mb-4">
+                            <label for="{{ form.withdrawal_method.id_for_label }}" class="form-label">
+                                <i class="bi bi-credit-card me-1"></i>Withdrawal Method *
+                            </label>
+                            {{ form.withdrawal_method }}
+                            {% if form.withdrawal_method.errors %}
+                                <div class="text-danger small">{{ form.withdrawal_method.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Bank Details -->
+                        <div class="card mb-4" id="bankDetails" style="background: var(--dark-surface-2);">
+                            <div class="card-header">
+                                <h6 class="mb-0 text-white">
+                                    <i class="bi bi-bank me-2 text-primary"></i>Bank Account Details
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.bank_name.id_for_label }}" class="form-label">Bank Name *</label>
+                                        {{ form.bank_name }}
+                                        {% if form.bank_name.errors %}
+                                            <div class="text-danger small">{{ form.bank_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.account_holder_name.id_for_label }}" class="form-label">Account Holder Name *</label>
+                                        {{ form.account_holder_name }}
+                                        {% if form.account_holder_name.errors %}
+                                            <div class="text-danger small">{{ form.account_holder_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.account_number.id_for_label }}" class="form-label">Account Number *</label>
+                                        {{ form.account_number }}
+                                        {% if form.account_number.errors %}
+                                            <div class="text-danger small">{{ form.account_number.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.ifsc_code.id_for_label }}" class="form-label">IFSC Code *</label>
+                                        {{ form.ifsc_code }}
+                                        {% if form.ifsc_code.errors %}
+                                            <div class="text-danger small">{{ form.ifsc_code.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- UPI Details -->
+                        <div class="card mb-4" id="upiDetails" style="background: var(--dark-surface-2); display: none;">
+                            <div class="card-header">
+                                <h6 class="mb-0 text-white">
+                                    <i class="bi bi-phone me-2 text-primary"></i>UPI Details
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="{{ form.upi_id.id_for_label }}" class="form-label">UPI ID *</label>
+                                    {{ form.upi_id }}
+                                    {% if form.upi_id.errors %}
+                                        <div class="text-danger small">{{ form.upi_id.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Enter your UPI ID (e.g., yourname@paytm, yourname@googlepay)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="bi bi-chat-text me-1"></i>Additional Notes
+                            </label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger small">{{ form.notes.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Optional: Add any additional information about this withdrawal
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                                <i class="bi bi-check-circle me-2"></i>Submit Withdrawal Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Information Cards -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-primary h-100">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                            <h6 class="mb-0 text-dark">
+                                <i class="bi bi-info-circle me-2"></i>Withdrawal Guidelines
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="bi bi-check text-primary me-2"></i>
+                                    <span class="text-white">Minimum withdrawal amount is ₹100</span>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check text-primary me-2"></i>
+                                    <span class="text-white">Processing time: 1-3 business days</span>
+                                </li>
+                                <li class="mb-0">
+                                    <i class="bi bi-check text-primary me-2"></i>
+                                    <span class="text-white">Ensure bank details are accurate</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card border-warning h-100">
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--warning-color) 0%, #e6a600 100%);">
+                            <h6 class="mb-0 text-dark">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Important Notes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="bi bi-exclamation text-warning me-2"></i>
+                                    <span class="text-white">Double-check all bank details</span>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-exclamation text-warning me-2"></i>
+                                    <span class="text-white">Withdrawals are processed manually</span>
+                                </li>
+                                <li class="mb-0">
+                                    <i class="bi bi-exclamation text-warning me-2"></i>
+                                    <span class="text-white">Contact support for any issues</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Amount slider functionality
+    const amountSlider = document.getElementById('amountSlider');
+    const amountInput = document.getElementById('id_amount');
+    const amountDisplay = document.getElementById('amountDisplay');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    const maxAmount = {{ available_balance }};
+
+    function updateAmount() {
+        const amount = parseFloat(amountSlider.value);
+        amountInput.value = amount.toFixed(2);
+        amountDisplay.textContent = `₹${amount.toFixed(2)}`;
+    }
+
+    // Event listeners
+    amountSlider.addEventListener('input', updateAmount);
+    amountInput.addEventListener('input', function() {
+        const amount = parseFloat(this.value);
+        if (amount >= 100 && amount <= maxAmount) {
+            amountSlider.value = amount;
+        }
+    });
+
+    // Show/hide UPI details based on withdrawal method
+    const withdrawalMethod = document.getElementById('id_withdrawal_method');
+    const bankDetails = document.getElementById('bankDetails');
+    const upiDetails = document.getElementById('upiDetails');
+    const upiIdField = document.getElementById('id_upi_id');
+
+    function toggleDetails() {
+        if (withdrawalMethod.value === 'UPI') {
+            bankDetails.style.display = 'none';
+            upiDetails.style.display = 'block';
+            upiIdField.required = true;
+        } else {
+            bankDetails.style.display = 'block';
+            upiDetails.style.display = 'none';
+            upiIdField.required = false;
+        }
+    }
+
+    withdrawalMethod.addEventListener('change', toggleDetails);
+    
+    // Initial setup
+    updateAmount();
+    toggleDetails();
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const amount = parseFloat(amountInput.value);
+        
+        if (amount < 100) {
+            e.preventDefault();
+            alert('Minimum withdrawal amount is ₹100.00');
+            return false;
+        }
+        
+        if (amount > maxAmount) {
+            e.preventDefault();
+            alert(`Withdrawal amount cannot exceed available balance (₹${maxAmount.toFixed(2)}).`);
+            return false;
+        }
+        
+        // Disable submit button to prevent double submission
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
+    });
+</script>
+{% endblock %}
